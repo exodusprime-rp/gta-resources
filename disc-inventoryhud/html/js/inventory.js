@@ -819,9 +819,23 @@ function ItemUsed(alerts) {
                         $(`.alert-${index}`).find('.item').append(`<div class="item-keybind">${data.item.slot}</div>`)
                     }
                 });
+            console.log(data.data);
+            if (data.action === 'removed') {
+                $.post("http://disc-inventoryhud/RemovedItem", JSON.stringify({
+                    item: data.data,
+                    count: data.qty
+                }));
+            }
+            if (data.action === 'added') {
+                $.post("http://disc-inventoryhud/AddingItem", JSON.stringify({
+                    item: data.data,
+                    count: data.qty
+                }));
+            }
+           
         });
     });
-
+    
     $('#use-alert').show('slide', { direction: 'left' }, 500, function() {
         alertTimer = setTimeout(function() {
             $('#use-alert .slot').addClass('expired');

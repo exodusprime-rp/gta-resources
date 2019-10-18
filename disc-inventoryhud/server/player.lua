@@ -82,13 +82,29 @@ AddEventHandler('disc-inventoryhud:notifyImpendingAddition', function(item, coun
 end)
 
 AddEventHandler('esx:onRemoveInventoryItem', function(source, item, count)
-    local player = ESX.GetPlayerFromId(source)
     TriggerClientEvent('disc-inventoryhud:showItemUse', source, {
-        { id = item.name, label = item.label, qty = count, msg = 'Item Removed' }
+        { id = item.name, label = item.label, qty = count, msg = 'Item Removed' , action = 'removed', data = item }
     })
+end)
+
+AddEventHandler('esx:onAddInventoryItem', function(source, esxItem, count)
+    TriggerClientEvent('disc-inventoryhud:showItemUse', source, {
+        { id = esxItem.name, label = esxItem.label, qty = count, msg = 'Item Added' , action = 'added' , data = esxItem }
+    })
+end)
+
+
+RegisterServerEvent('disc-inventoryhud:RemovedItem')
+AddEventHandler('disc-inventoryhud:RemovedItem', function(data)
+    local source = source
+    local item = data.item
+    local count = data.count
+    local player = ESX.GetPlayerFromId(source)
     getInventory(player.identifier, 'player', function(inventory)
         if impendingRemovals[source] then
-            print('Looking at source' .. source)
+            print('Looking at source ' .. source)
+            local extImp = json.encode(impendingRemovals[source])
+            print(extImp)
             for k, removingItem in pairs(impendingRemovals[source]) do
                 print('Looking at ' .. removingItem.id)
                 if removingItem.id == item.name and removingItem.count == count then
@@ -111,13 +127,15 @@ AddEventHandler('esx:onRemoveInventoryItem', function(source, item, count)
         saveInventory(player.identifier, 'player', inventory)
         TriggerClientEvent('disc-inventoryhud:refreshInventory', source)
     end)
+
 end)
 
-AddEventHandler('esx:onAddInventoryItem', function(source, esxItem, count)
+RegisterServerEvent('disc-inventoryhud:AddingItem')
+AddEventHandler('disc-inventoryhud:AddingItem', function(data)
+    local source = source
+    local esxItem = data.item
+    local count = data.count
     local player = ESX.GetPlayerFromId(source)
-    TriggerClientEvent('disc-inventoryhud:showItemUse', source, {
-        { id = esxItem.name, label = esxItem.label, qty = count, msg = 'Item Added' }
-    })
     getInventory(player.identifier, 'player', function(inventory)
         if impendingAdditions[source] then
             for k, addingItem in pairs(impendingAdditions[source]) do
@@ -137,6 +155,5 @@ AddEventHandler('esx:onAddInventoryItem', function(source, esxItem, count)
         saveInventory(player.identifier, 'player', inventory)
         TriggerClientEvent('disc-inventoryhud:refreshInventory', source)
     end)
+
 end)
-
-

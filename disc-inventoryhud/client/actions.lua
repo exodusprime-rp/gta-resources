@@ -1,4 +1,5 @@
 RegisterNUICallback('UseItem', function(data)
+
     TriggerServerEvent('disc-inventoryhud:notifyImpendingRemoval', data.item, 1)
     TriggerServerEvent("esx:useItem", data.item.id)
     TriggerEvent('disc-inventoryhud:refreshInventory')
@@ -62,7 +63,9 @@ AddEventHandler('disc-inventoryhud:showItemUse', function(items)
                 itemId = v.id
             },
             qty = v.qty,
-            message = v.msg
+            message = v.msg,
+            action = v.action,
+            data = v.data
         })
     end
     print(#data)
@@ -72,3 +75,12 @@ AddEventHandler('disc-inventoryhud:showItemUse', function(items)
     })
 end)
 
+
+
+RegisterNUICallback('RemovedItem', function(data)
+    TriggerServerEvent('disc-inventoryhud:RemovedItem', data)
+end)
+
+RegisterNUICallback('AddingItem', function(data)
+    TriggerServerEvent('disc-inventoryhud:AddingItem', data)
+end)
